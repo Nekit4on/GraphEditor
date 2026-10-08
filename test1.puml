@@ -1,0 +1,178 @@
+@startuml
+class model.ShapeGroup {
+- List<Shape> children
++ void addChild(Shape)
++ void removeChild(Shape)
++ List<Shape> getChildren()
++ void draw(GraphicsContext)
++ boolean contains(double,double)
++ void move(double,double)
++ Shape copy()
++ void resize(double)
+}
+
+
+class view.EditorView {
+- Canvas canvas
+- ColorPicker colorPicker
+- ComboBox<String> shapeSelector
+- CheckBox cbShadow
+- CheckBox cbEraser
+- EditorController controller
++ void redraw(Model,List<Shape>)
+- void saveFile(Stage)
+- void loadFile(Stage)
++ Color getSelectedColor()
+}
+
+
+class model.Circle {
+- double radius
++ void draw(GraphicsContext)
++ boolean contains(double,double)
++ Shape copy()
++ void resize(double)
+}
+
+
+class Main {
++ void start(Stage)
++ {static} void main(String[])
+}
+
+class model.Ellipse {
+- double radiusX
++ void draw(GraphicsContext)
++ boolean contains(double,double)
++ Shape copy()
++ void resize(double)
+}
+
+
+class model.Square {
+- double size
++ void draw(GraphicsContext)
++ boolean contains(double,double)
++ Shape copy()
++ void resize(double)
+}
+
+
+class model.Model {
+- List<Shape> shapes
+- List<Dot> dots
+- Shape copiedShape
++ void addShape(Shape)
++ void addDot(Dot)
++ void removeShape(Shape)
++ Shape getShapeAt(double,double)
++ List<Shape> getShapes()
++ List<Dot> getDots()
++ void clear()
++ void bringToFront(Shape)
++ void sendToBack(Shape)
++ ShapeGroup groupShapes(List<Shape>)
++ void ungroupShape(ShapeGroup)
++ void save(String)
++ void load(String)
++ void copyProperties(Shape)
++ void applyProperties(Shape)
++ Shape getCopiedShape()
+}
+
+
+class model.Dot {
+- double size
++ void draw(GraphicsContext)
++ boolean contains(double,double)
++ Shape copy()
++ void resize(double)
+}
+
+
+abstract class model.Shape {
+# Color color
+# double x
+# boolean visible
+# int zOrder
+# boolean shadowEnabled
+# String text
+# String fillPattern
++ {abstract}void draw(GraphicsContext)
++ {abstract}boolean contains(double,double)
++ {abstract}Shape copy()
++ void move(double,double)
++ void setShadow(boolean)
++ boolean isShadowEnabled()
++ void setText(String)
++ String getText()
++ void setFillPattern(String)
++ String getFillPattern()
++ void setVisible(boolean)
++ boolean isVisible()
++ Color getColor()
++ void setColor(Color)
++ double getX()
++ double getY()
++ int getZOrder()
++ void setZOrder(int)
++ {abstract}void resize(double)
+}
+
+
+class controller.EditorController {
+- Model model
+- EditorView view
+- List<Shape> selectedShapes
+- boolean isDrawingDots
+- boolean eraserMode
+- double lastX
++ void setView(EditorView)
++ void setEraserMode(boolean)
++ void onMousePressed(MouseEvent)
++ void onMouseDragged(MouseEvent)
++ void onMouseReleased(MouseEvent)
++ void addShape(String)
++ void deleteSelected()
++ void bringSelectedToFront()
++ void sendSelectedToBack()
++ void groupSelected()
++ void ungroupSelected()
++ void toggleVisibility()
++ void copyProperties()
++ void applyProperties()
++ void setTextForSelected(String)
++ void resizeSelected(double)
++ void save(String)
++ void load(String)
++ void setFillPattern(String)
+}
+
+
+class model.Rectangle {
+- double width
++ void draw(GraphicsContext)
++ boolean contains(double,double)
++ Shape copy()
++ void resize(double)
+}
+
+
+
+
+java.io.Serializable <|.. model.ShapeGroup
+model.Shape <|-- model.ShapeGroup
+java.io.Serializable <|.. model.Circle
+model.Shape <|-- model.Circle
+javafx.application.Application <|-- Main
+java.io.Serializable <|.. model.Ellipse
+model.Shape <|-- model.Ellipse
+java.io.Serializable <|.. model.Square
+model.Shape <|-- model.Square
+model.Serializable <|.. model.Model
+java.io.Serializable <|.. model.Dot
+model.Shape <|-- model.Dot
+java.io.Serializable <|.. model.Shape
+java.io.Serializable <|.. model.Rectangle
+model.Shape <|-- model.Rectangle
+@enduml
