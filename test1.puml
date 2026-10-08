@@ -1,5 +1,5 @@
 @startuml
-class model.ShapeGroup {
+class model.PixelGroup {
 - List<Shape> children
 + void addChild(Shape)
 + void removeChild(Shape)
@@ -81,7 +81,7 @@ class model.Model {
 }
 
 
-class model.Dot {
+class model.Point {
 - double size
 + void draw(GraphicsContext)
 + boolean contains(double,double)
@@ -90,7 +90,7 @@ class model.Dot {
 }
 
 
-abstract class model.Shape {
+abstract class model.Pixel {
 # Color color
 # double x
 # boolean visible
@@ -160,19 +160,19 @@ class model.Rectangle {
 
 
 
-java.io.Serializable <|.. model.ShapeGroup
-model.Shape <|-- model.ShapeGroup
+java.io.Serializable <|.. model.PixelGroup
+model.Pixel <|-- model.PixelGroup
 java.io.Serializable <|.. model.Circle
-model.Shape <|-- model.Circle
+model.Pixel <|-- model.Circle
 javafx.application.Application <|-- Main
 java.io.Serializable <|.. model.Ellipse
-model.Shape <|-- model.Ellipse
+model.Pixel <|-- model.Ellipse
 java.io.Serializable <|.. model.Square
-model.Shape <|-- model.Square
+model.Pixel <|-- model.Square
 model.Serializable <|.. model.Model
-java.io.Serializable <|.. model.Dot
-model.Shape <|-- model.Dot
-java.io.Serializable <|.. model.Shape
+java.io.Serializable <|.. model.Point
+model.Pixel <|-- model.Point
+java.io.Serializable <|.. model.Pixel
 java.io.Serializable <|.. model.Rectangle
-model.Shape <|-- model.Rectangle
+model.Pixel <|-- model.Rectangle
 @enduml

@@ -6,36 +6,36 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShapeGroup extends Shape implements Serializable {
-    private List<Shape> children = new ArrayList<>();
+public class PixelGroup extends Pixel implements Serializable {
+    private List<Pixel> children = new ArrayList<>();
 
-    public ShapeGroup(double x, double y) {
+    public PixelGroup(double x, double y) {
         super(Color.BLACK, x, y);
     }
 
-    public void addChild(Shape shape) {
-        children.add(shape);
+    public void addChild(Pixel pixel) {
+        children.add(pixel);
     }
 
-    public void removeChild(Shape shape) {
-        children.remove(shape);
+    public void removeChild(Pixel pixel) {
+        children.remove(pixel);
     }
 
-    public List<Shape> getChildren() {
+    public List<Pixel> getChildren() {
         return children;
     }
 
     @Override
     public void draw(GraphicsContext gc) {
         if (!visible) return;
-        for (Shape child : children) {
+        for (Pixel child : children) {
             child.draw(gc);
         }
     }
 
     @Override
     public boolean contains(double px, double py) {
-        for (Shape child : children) {
+        for (Pixel child : children) {
             if (child.contains(px, py)) return true;
         }
         return false;
@@ -44,18 +44,18 @@ public class ShapeGroup extends Shape implements Serializable {
     @Override
     public void move(double dx, double dy) {
         super.move(dx, dy);
-        for (Shape child : children) {
+        for (Pixel child : children) {
             child.move(dx, dy);
         }
     }
 
     @Override
-    public Shape copy() {
-        ShapeGroup copy = new ShapeGroup(x, y);
+    public Pixel copy() {
+        PixelGroup copy = new PixelGroup(x, y);
         copy.setColor(color);
         copy.setShadow(shadowEnabled);
         copy.setVisible(visible);
-        for (Shape child : children) {
+        for (Pixel child : children) {
             copy.addChild(child.copy());
         }
         return copy;
@@ -63,7 +63,7 @@ public class ShapeGroup extends Shape implements Serializable {
 
     @Override
     public void resize(double factor) {
-        for (Shape child : children) {
+        for (Pixel child : children) {
             child.resize(factor);
         }
     }

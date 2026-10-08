@@ -11,7 +11,7 @@ public class Main extends Application {
         EditorController controller = new EditorController(model);
         EditorView view = new EditorView(stage, controller);
         controller.setView(view);
-        view.redraw(model, null);
+        view.redraw(model);
     }
 
     public static void main(String[] args) {

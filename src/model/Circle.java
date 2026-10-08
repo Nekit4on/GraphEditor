@@ -4,10 +4,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import java.io.Serializable;
 
-public class Circle extends Shape implements Serializable {
+public class Circle extends Pixel implements Serializable {
     private double radius;
 
-    public Circle(Color color, double x, double y, double radius) {
+    public Circle(double x, double y, Color color, double radius) {
         super(color, x, y);
         this.radius = radius;
     }
@@ -74,8 +74,8 @@ public class Circle extends Shape implements Serializable {
     }
 
     @Override
-    public Shape copy() {
-        Circle copy = new Circle(color, x, y, radius);
+    public Circle copy() {
+        Circle copy = new Circle(x, y, color, radius);
         copy.setShadow(shadowEnabled);
         copy.setVisible(visible);
         return copy;
@@ -86,5 +86,9 @@ public class Circle extends Shape implements Serializable {
         radius *= factor;
         if (radius < 5) radius = 5;
         if (radius > 200) radius = 200;
+    }
+
+    public double getRadius() {
+        return radius;
     }
 }

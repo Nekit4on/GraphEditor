@@ -5,7 +5,7 @@ import javafx.scene.paint.Color;
 import java.io.Serializable;
 
 
-public abstract class Shape implements Serializable {
+public abstract class Pixel implements Serializable {
     protected Color color;
     protected double x, y;
     protected boolean visible = true;
@@ -14,7 +14,7 @@ public abstract class Shape implements Serializable {
     protected String text = "";
     protected String fillPattern = "solid"; // solid, hatch, dots, grid
 
-    public Shape(Color color, double x, double y) {
+    public Pixel(Color color, double x, double y) {
         this.color = color;
         this.x = x;
         this.y = y;
@@ -22,7 +22,7 @@ public abstract class Shape implements Serializable {
 
     public abstract void draw(GraphicsContext gc);
     public abstract boolean contains(double px, double py);
-    public abstract Shape copy();
+    public abstract Pixel copy();
 
     public void move(double dx, double dy) {
         x += dx;

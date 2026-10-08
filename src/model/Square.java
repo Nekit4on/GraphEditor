@@ -4,10 +4,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import java.io.Serializable;
 
-public class Square extends Shape implements Serializable {
+public class Square extends Pixel implements Serializable {
     private double size;
 
-    public Square(Color color, double x, double y, double size) {
+    public Square(double x, double y, Color color, double size) {
         super(color, x, y);
         this.size = size;
     }
@@ -62,8 +62,8 @@ public class Square extends Shape implements Serializable {
     }
 
     @Override
-    public Shape copy() {
-        Square copy = new Square(color, x, y, size);
+    public Square copy() {
+        Square copy = new Square(x, y, color, size);
         copy.setShadow(shadowEnabled);
         copy.setVisible(visible);
         return copy;
@@ -74,5 +74,9 @@ public class Square extends Shape implements Serializable {
         size *= factor;
         if (size < 10) size = 10;
         if (size > 300) size = 300;
+    }
+
+    public double getSize() {
+        return size;
     }
 }
