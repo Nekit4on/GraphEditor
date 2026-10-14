@@ -2,23 +2,22 @@ package model;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PixelGroup extends Pixel implements Serializable {
+public class PixelGroup extends Pixel {
     private List<Pixel> children = new ArrayList<>();
 
     public PixelGroup(double x, double y) {
-        super(Color.BLACK, x, y);
+        super(x, y, Color.BLACK);
     }
 
-    public void addChild(Pixel pixel) {
-        children.add(pixel);
+    public void addChild(Pixel shape) {
+        children.add(shape);
     }
 
-    public void removeChild(Pixel pixel) {
-        children.remove(pixel);
+    public void removeChild(Pixel shape) {
+        children.remove(shape);
     }
 
     public List<Pixel> getChildren() {
@@ -27,7 +26,7 @@ public class PixelGroup extends Pixel implements Serializable {
 
     @Override
     public void draw(GraphicsContext gc) {
-        if (!visible) return;
+        if (!isVisible()) return;
         for (Pixel child : children) {
             child.draw(gc);
         }
@@ -51,12 +50,12 @@ public class PixelGroup extends Pixel implements Serializable {
 
     @Override
     public Pixel copy() {
-        PixelGroup copy = new PixelGroup(x, y);
-        copy.setColor(color);
-        copy.setShadow(shadowEnabled);
-        copy.setVisible(visible);
+        PixelGroup copy = new PixelGroup(getX(), getY());
+        copy.setColor(getColor());
+        copy.setShadow(isShadowEnabled());
+        copy.setVisible(isVisible());
         for (Pixel child : children) {
-            copy.addChild(child.copy());
+            copy.addChild((Pixel) child.copy());
         }
         return copy;
     }

@@ -4,7 +4,7 @@
 
 ```bash
 # 1. Перейти в папку проекта
-cd "D:\GIGA IDE\GIGA IDE projects\lab_1_schedulenotifier_beta"
+cd "D:\GIGA IDE\GIGA IDE projects\имя проекта"
 
 # 2. Проверить статус
 git status

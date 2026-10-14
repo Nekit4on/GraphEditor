@@ -2,8 +2,8 @@ package view;
 
 import controller.EditorController;
 import model.*;
-import model.PixelFactory.PixelType;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -11,13 +11,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.FileChooser;
 import java.util.List;
 
 public class EditorView {
     private Canvas canvas;
     private ColorPicker colorPicker;
     private ComboBox<String> toolSelector;
+    private Button btnFinishPoly;
     private EditorController controller;
 
     public EditorView(Stage stage, EditorController controller) {
@@ -25,202 +25,125 @@ public class EditorView {
 
         BorderPane root = new BorderPane();
 
-        // === ХОЛСТ  ===
         canvas = new Canvas(800, 600);
         canvas.setOnMousePressed(controller::onMousePressed);
         canvas.setOnMouseDragged(controller::onMouseDragged);
         canvas.setOnMouseReleased(controller::onMouseReleased);
         root.setCenter(canvas);
 
-
         HBox topPanel = new HBox(10);
         topPanel.setPadding(new Insets(10));
 
         Button btnClear = new Button("Очистить холст");
         btnClear.setOnAction(e -> controller.clearCanvas());
-        topPanel.getChildren().addAll(btnClear);
 
-        /*
+        btnFinishPoly = new Button("Завершить полигон");
+        btnFinishPoly.setOnAction(e -> controller.finishPolygon());
+        btnFinishPoly.setVisible(false);
+        btnFinishPoly.setStyle("-fx-base: #ffcc00; -fx-font-weight: bold;");
 
-        Button btnGroup = new Button("Сгруппировать");
-        Button btnUngroup = new Button("Разгруппировать");
-        Button btnDelete = new Button("Удалить");
-        Button btnFront = new Button("На передний план");
-        Button btnBack = new Button("На задний план");
-        Button btnCopyProps = new Button("Копировать св-ва");
-        Button btnApplyProps = new Button("Применить св-ва");
-        Button btnToggleVisible = new Button("Скрыть/Показать");
-
-        btnGroup.setOnAction(e -> controller.groupSelected());
-        btnUngroup.setOnAction(e -> controller.ungroupSelected());
-        btnDelete.setOnAction(e -> controller.deleteSelected());
-        btnFront.setOnAction(e -> controller.bringSelectedToFront());
-        btnBack.setOnAction(e -> controller.sendSelectedToBack());
-        btnCopyProps.setOnAction(e -> controller.copyProperties());
-        btnApplyProps.setOnAction(e -> controller.applyProperties());
-        btnToggleVisible.setOnAction(e -> controller.toggleVisibility());
-
-        topPanel.getChildren().addAll(btnClear, new Separator(),
-                                      btnGroup, btnUngroup, btnDelete, new Separator(),
-                                      btnFront, btnBack, new Separator(),
-                                      btnCopyProps, btnApplyProps, new Separator(),
-                                      btnToggleVisible);
-        */
-
+        topPanel.getChildren().addAll(btnClear, btnFinishPoly);
         root.setTop(topPanel);
 
-        // === ЛЕВАЯ ПАНЕЛЬ  ===
         VBox leftPanel = new VBox(10);
         leftPanel.setPadding(new Insets(10));
-        leftPanel.setPrefWidth(180);
+        leftPanel.setPrefWidth(220);
 
         Label lblTool = new Label("Инструмент:");
         toolSelector = new ComboBox<>();
-        toolSelector.getItems().addAll("Точка", "Круг", "Квадрат");
-        toolSelector.setValue("Точка");
+        toolSelector.getItems().addAll(
+                "Точка (рисовать мышью)",
+                "Круг (клик для создания)",
+                "Круг (рисовать мышью)",
+                "Квадрат (клик для создания)",
+                "Квадрат (рисовать мышью)",
+                "Полигон (серия кликов)",
+                "Выделение / Перемещение"
+        );
+        toolSelector.setValue("Точка (рисовать мышью)");
 
         toolSelector.setOnAction(e -> {
             String val = toolSelector.getValue();
-            if ("Точка".equals(val)) {
-                controller.setTool(PixelType.POINT);
-            } else if ("Круг".equals(val)) {
-                controller.setTool(PixelType.CIRCLE);
-            } else if ("Квадрат".equals(val)) {
-                controller.setTool(PixelType.SQUARE);
-            }
-        });
-
-        Button btnAdd = new Button("Добавить фигуру");
-        btnAdd.setOnAction(e -> {
-            String val = toolSelector.getValue();
-            if ("Круг".equals(val)) {
-                controller.addPixel(PixelType.CIRCLE);
-            } else if ("Квадрат".equals(val)) {
-                controller.addPixel(PixelType.SQUARE);
-            }
+            if ("Точка (рисовать мышью)".equals(val)) controller.setTool("POINT");
+            else if ("Круг (клик для создания)".equals(val)) controller.setTool("CIRCLE");
+            else if ("Круг (рисовать мышью)".equals(val)) controller.setTool("CIRCLE_DRAW");
+            else if ("Квадрат (клик для создания)".equals(val)) controller.setTool("SQUARE");
+            else if ("Квадрат (рисовать мышью)".equals(val)) controller.setTool("SQUARE_DRAW");
+            else if ("Полигон (серия кликов)".equals(val)) controller.startPolygonDrawing();
+            else if ("Выделение / Перемещение".equals(val)) controller.setTool("SELECT");
         });
 
         colorPicker = new ColorPicker(Color.RED);
 
+        Separator sep1 = new Separator();
+        Label lblDecorators = new Label("Декораторы (для полигона):");
+        Button btnFill = new Button("Заливка");
+        Button btnBorder = new Button("Контур");
+        Button btnShadow = new Button("Тень");
+
+        btnFill.setOnAction(e -> controller.applyFill());
+        btnBorder.setOnAction(e -> controller.applyBorder());
+        btnShadow.setOnAction(e -> controller.applyShadow());
+
         leftPanel.getChildren().addAll(
-                lblTool, toolSelector, btnAdd,
+                lblTool, toolSelector,
                 new Separator(),
-                new Label("Цвет:"), colorPicker
+                new Label("Цвет фигуры / декора:"), colorPicker,
+                sep1,
+                lblDecorators, btnFill, btnBorder, btnShadow
         );
-
-        /*
-        CheckBox cbShadow = new CheckBox("Тень");
-        CheckBox cbEraser = new CheckBox("Ластик");
-        cbEraser.setOnAction(e -> controller.setEraserMode(cbEraser.isSelected()));
-
-        TextField textField = new TextField();
-        textField.setPromptText("Текст для фигуры");
-        textField.setPrefWidth(150);
-        Button btnSetText = new Button("Установить текст");
-        btnSetText.setOnAction(e -> controller.setTextForSelected(textField.getText()));
-
-        Label lblSize = new Label("Размер:");
-        Slider sizeSlider = new Slider(0.5, 2.0, 1.0);
-        sizeSlider.setShowTickLabels(true);
-        sizeSlider.setShowTickMarks(true);
-        sizeSlider.setMajorTickUnit(0.5);
-        sizeSlider.setMinorTickCount(5);
-        sizeSlider.setPrefWidth(150);
-        Button btnResize = new Button("Применить размер");
-        btnResize.setOnAction(e -> controller.resizeSelected(sizeSlider.getValue()));
-
-        Label lblPattern = new Label("Заполнение:");
-        ComboBox<String> patternSelector = new ComboBox<>();
-        patternSelector.getItems().addAll("Сплошной", "Штриховка", "Точки", "Сетка");
-        patternSelector.setValue("Сплошной");
-        patternSelector.setPrefWidth(150);
-        Button btnSetPattern = new Button("Применить заполнение");
-        btnSetPattern.setOnAction(e -> {
-            String val = patternSelector.getValue();
-            if (val == null) return;
-            switch (val) {
-                case "Сплошной": controller.setFillPattern("solid"); break;
-                case "Штриховка": controller.setFillPattern("hatch"); break;
-                case "Точки": controller.setFillPattern("dots"); break;
-                case "Сетка": controller.setFillPattern("grid"); break;
-            }
-        });
-
-        Button btnSave = new Button("Сохранить");
-        Button btnLoad = new Button("Загрузить");
-        btnSave.setOnAction(e -> saveFile(stage));
-        btnLoad.setOnAction(e -> loadFile(stage));
-
-        leftPanel.getChildren().addAll(
-            new Separator(),
-            cbShadow, cbEraser,
-            new Separator(),
-            textField, btnSetText,
-            new Separator(),
-            lblSize, sizeSlider, btnResize,
-            new Separator(),
-            lblPattern, patternSelector, btnSetPattern,
-            new Separator(),
-            btnSave, btnLoad
-        );
-        */
-
         root.setLeft(leftPanel);
 
         Scene scene = new Scene(root, 1200, 650);
-        stage.setTitle("Графический редактор (Инкремент 1)");
+        stage.setTitle("Графический редактор (Инкремент 1 + 2)");
         stage.setScene(scene);
         stage.show();
     }
 
-    // === МЕТОД ОТРИСОВКИ ===
-    public void redraw(Model model) {
+    public void updatePolygonButton(boolean visible) {
+        btnFinishPoly.setVisible(visible);
+    }
+
+    public void redraw(Model model, List<Point2D> tempVertices) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        for (Pixel p : model.getPixels()) {
-            p.draw(gc);
+        for (Shape s : model.getElements()) {
+            s.draw(gc);
         }
 
-        /*
-        // Отрисовка точек (если они хранятся отдельно)
-        // for (Dot d : model.getDots()) d.draw(gc);
+        if (tempVertices != null && !tempVertices.isEmpty()) {
+            gc.setStroke(Color.BLUE);
+            gc.setLineWidth(2);
+            gc.beginPath();
+            gc.moveTo(tempVertices.get(0).getX(), tempVertices.get(0).getY());
+            for (int i = 1; i < tempVertices.size(); i++) {
+                gc.lineTo(tempVertices.get(i).getX(), tempVertices.get(i).getY());
+            }
+            gc.stroke();
 
-        // Отрисовка рамки выделения
-        // for (Shape s : model.getShapes()) {
-        //     s.draw(gc);
-        //     if (selected.contains(s)) {
-        //         gc.setStroke(Color.BLUE);
-        //         gc.setLineWidth(2);
-        //         gc.setLineDashes(5);
-        //         gc.strokeRect(s.getX() - 35, s.getY() - 35, 70, 70);
-        //         gc.setLineDashes(0);
-        //     }
-        // }
-        */
+            gc.setFill(Color.RED);
+            for (Point2D p : tempVertices) {
+                gc.fillOval(p.getX() - 3, p.getY() - 3, 6, 6);
+            }
+        }
+
+        Shape selected = model.getSelectedElement();
+        if (selected != null) {
+            gc.setStroke(Color.GREEN);
+            gc.setLineWidth(2);
+            gc.setLineDashes(5);
+            gc.strokeRect(selected.getX() - 40, selected.getY() - 40, 80, 80);
+            gc.setLineDashes(0);
+        }
+    }
+
+    public void redraw(Model model) {
+        redraw(model, null);
     }
 
     public Color getSelectedColor() {
         return colorPicker.getValue();
     }
-
-    /*
-    // ============================================================
-    // СОХРАНЕНО ДЛЯ ИНКРЕМЕНТА 3 (Раскомментировать позже)
-    // ============================================================
-    private void saveFile(Stage stage) {
-        FileChooser fc = new FileChooser();
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Graph", "*.graph"));
-        java.io.File f = fc.showSaveDialog(stage);
-        if (f != null) controller.save(f.getAbsolutePath());
-    }
-
-    private void loadFile(Stage stage) {
-        FileChooser fc = new FileChooser();
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Graph", "*.graph"));
-        java.io.File f = fc.showOpenDialog(stage);
-        if (f != null) controller.load(f.getAbsolutePath());
-    }
-    */
 }

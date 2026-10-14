@@ -2,28 +2,30 @@ package model;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import java.io.Serializable;
 
-
-public abstract class Pixel implements Serializable {
-    protected Color color;
+public abstract class Pixel implements Shape {
     protected double x, y;
+    protected Color color;
     protected boolean visible = true;
-    protected int zOrder = 0;
     protected boolean shadowEnabled = false;
     protected String text = "";
-    protected String fillPattern = "solid"; // solid, hatch, dots, grid
+    protected String fillPattern = "solid";
 
-    public Pixel(Color color, double x, double y) {
-        this.color = color;
+    public Pixel(double x, double y, Color color) {
         this.x = x;
         this.y = y;
+        this.color = color;
     }
 
     public abstract void draw(GraphicsContext gc);
     public abstract boolean contains(double px, double py);
     public abstract Pixel copy();
+    public abstract void resize(double factor);
 
+    public double getX() { return x; }
+    public double getY() { return y; }
+
+    @Override
     public void move(double dx, double dy) {
         x += dx;
         y += dy;
@@ -39,10 +41,4 @@ public abstract class Pixel implements Serializable {
     public boolean isVisible() { return visible; }
     public Color getColor() { return color; }
     public void setColor(Color color) { this.color = color; }
-    public double getX() { return x; }
-    public double getY() { return y; }
-    public int getZOrder() { return zOrder; }
-    public void setZOrder(int zOrder) { this.zOrder = zOrder; }
-
-    public abstract void resize(double factor);
 }
