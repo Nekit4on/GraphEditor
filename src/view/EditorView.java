@@ -2,6 +2,7 @@ package view;
 
 import controller.EditorController;
 import model.*;
+import model.shapes.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Scene;

@@ -1,6 +1,7 @@
 package controller;
 
 import model.*;
+import model.shapes.*;
 import model.PixelFactory.PixelType;
 import view.EditorView;
 import javafx.geometry.Point2D;

@@ -1,5 +1,6 @@
 package model;
 
+import model.shapes.*;
 import javafx.scene.paint.Color;
 
 public class PixelFactory {
