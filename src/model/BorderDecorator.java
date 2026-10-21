@@ -18,14 +18,14 @@ public class BorderDecorator extends ShapeDecorator {
 
     @Override
     public void draw(GraphicsContext gc) {
-        if (decoratedShape instanceof Polygon) {
-            Polygon poly = (Polygon) decoratedShape;
+        Polygon poly = findBasePolygon();
+        if (poly != null) {
             Paint oldStroke = gc.getStroke();
             double oldWidth = gc.getLineWidth();
-            
+
             gc.setStroke(borderColor);
             gc.setLineWidth(borderWidth);
-            
+
             gc.beginPath();
             List<Point2D> vertices = poly.getVertices();
             for (int i = 0; i < vertices.size(); i++) {
@@ -35,11 +35,19 @@ public class BorderDecorator extends ShapeDecorator {
             }
             gc.closePath();
             gc.stroke();
-            
+
             gc.setStroke(oldStroke);
             gc.setLineWidth(oldWidth);
         }
         decoratedShape.draw(gc);
+    }
+
+    private Polygon findBasePolygon() {
+        Shape s = decoratedShape;
+        while (s instanceof ShapeDecorator) {
+            s = ((ShapeDecorator) s).decoratedShape;
+        }
+        return (s instanceof Polygon) ? (Polygon) s : null;
     }
 
     @Override

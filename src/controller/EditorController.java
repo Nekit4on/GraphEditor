@@ -92,6 +92,7 @@ public class EditorController {
             PixelType type = "CIRCLE".equals(currentTool) ? PixelType.CIRCLE : PixelType.SQUARE;
             Pixel pixel = PixelFactory.createPixel(type, e.getX(), e.getY(), view.getSelectedColor());
             model.addElement(pixel);
+            view.redraw(model, currentPolygonVertices);
             return;
         }
     }

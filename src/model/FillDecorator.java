@@ -16,10 +16,10 @@ public class FillDecorator extends ShapeDecorator {
 
     @Override
     public void draw(GraphicsContext gc) {
-        if (decoratedShape instanceof Polygon) {
-            Polygon poly = (Polygon) decoratedShape;
+        Polygon poly = findBasePolygon();
+        if (poly != null) {
             Paint oldFill = gc.getFill();
-            
+
             gc.setFill(fillColor);
             gc.beginPath();
             List<Point2D> vertices = poly.getVertices();
@@ -30,10 +30,18 @@ public class FillDecorator extends ShapeDecorator {
             }
             gc.closePath();
             gc.fill();
-            
+
             gc.setFill(oldFill);
         }
         decoratedShape.draw(gc);
+    }
+
+    private Polygon findBasePolygon() {
+        Shape s = decoratedShape;
+        while (s instanceof ShapeDecorator) {
+            s = ((ShapeDecorator) s).decoratedShape;
+        }
+        return (s instanceof Polygon) ? (Polygon) s : null;
     }
 
     @Override
