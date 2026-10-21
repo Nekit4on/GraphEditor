@@ -3,10 +3,11 @@ package model.shapes;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Polygon implements Shape {
+public class Polygon implements Shape, Serializable {
     private List<Point2D> vertices;
     private double centerX, centerY;
 
@@ -17,10 +18,7 @@ public class Polygon implements Shape {
 
     private void calculateCenter() {
         double sumX = 0, sumY = 0;
-        for (Point2D p : vertices) {
-            sumX += p.getX();
-            sumY += p.getY();
-        }
+        for (Point2D p : vertices) { sumX += p.getX(); sumY += p.getY(); }
         this.centerX = vertices.isEmpty() ? 0 : sumX / vertices.size();
         this.centerY = vertices.isEmpty() ? 0 : sumY / vertices.size();
     }
@@ -28,12 +26,9 @@ public class Polygon implements Shape {
     @Override
     public void draw(GraphicsContext gc) {
         if (vertices.size() < 3) return;
-        
         gc.beginPath();
         gc.moveTo(vertices.get(0).getX(), vertices.get(0).getY());
-        for (int i = 1; i < vertices.size(); i++) {
-            gc.lineTo(vertices.get(i).getX(), vertices.get(i).getY());
-        }
+        for (int i = 1; i < vertices.size(); i++) gc.lineTo(vertices.get(i).getX(), vertices.get(i).getY());
         gc.closePath();
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(1);
@@ -48,7 +43,7 @@ public class Polygon implements Shape {
 
     @Override
     public boolean contains(double px, double py) {
-
+        if (vertices.isEmpty()) return false;
         double minX = vertices.get(0).getX(), maxX = vertices.get(0).getX();
         double minY = vertices.get(0).getY(), maxY = vertices.get(0).getY();
         for (Point2D p : vertices) {
@@ -65,11 +60,8 @@ public class Polygon implements Shape {
     @Override
     public void move(double dx, double dy) {
         List<Point2D> newVertices = new ArrayList<>();
-        for (Point2D p : vertices) {
-            newVertices.add(new Point2D(p.getX() + dx, p.getY() + dy));
-        }
+        for (Point2D p : vertices) newVertices.add(new Point2D(p.getX() + dx, p.getY() + dy));
         this.vertices = newVertices;
         calculateCenter();
     }
 }
-

@@ -3,23 +3,32 @@ package model.shapes;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
+import java.io.Serializable;
 import java.util.List;
 
-public class FillDecorator extends ShapeDecorator {
-    private Color fillColor;
+public class FillDecorator extends ShapeDecorator implements Serializable {
+    private transient Color fillColor;
+    private double fillR, fillG, fillB, fillOpacity;
 
     public FillDecorator(Shape decoratedShape, Color fillColor) {
         super(decoratedShape);
-        this.fillColor = fillColor;
+        setFillColor(fillColor);
+    }
+
+    public void setFillColor(Color color) {
+        this.fillColor = color;
+        this.fillR = color.getRed();
+        this.fillG = color.getGreen();
+        this.fillB = color.getBlue();
+        this.fillOpacity = color.getOpacity();
     }
 
     @Override
     public void draw(GraphicsContext gc) {
         Polygon poly = findBasePolygon();
         if (poly != null) {
-            Paint oldFill = gc.getFill();
-
+            javafx.scene.paint.Paint oldFill = gc.getFill();
+            
             gc.setFill(fillColor);
             gc.beginPath();
             List<Point2D> vertices = poly.getVertices();
@@ -30,7 +39,6 @@ public class FillDecorator extends ShapeDecorator {
             }
             gc.closePath();
             gc.fill();
-
             gc.setFill(oldFill);
         }
         decoratedShape.draw(gc);
@@ -48,5 +56,16 @@ public class FillDecorator extends ShapeDecorator {
     public boolean contains(double px, double py) {
         return decoratedShape.contains(px, py);
     }
-}
 
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+        out.defaultWriteObject();
+        out.writeDouble(fillR); out.writeDouble(fillG); out.writeDouble(fillB); out.writeDouble(fillOpacity);
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        this.fillR = in.readDouble(); this.fillG = in.readDouble();
+        this.fillB = in.readDouble(); this.fillOpacity = in.readDouble();
+        this.fillColor = new Color(fillR, fillG, fillB, fillOpacity);
+    }
+}

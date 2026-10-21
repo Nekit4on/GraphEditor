@@ -1,8 +1,9 @@
 package model.shapes;
 
 import javafx.scene.canvas.GraphicsContext;
+import java.io.Serializable;
 
-public interface Shape {
+public interface Shape extends Serializable {
     void draw(GraphicsContext gc);
     double getX();
     double getY();

@@ -2,10 +2,12 @@ package model.shapes;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import java.io.Serializable;
 
-public abstract class Pixel implements Shape {
+public abstract class Pixel implements Shape, Serializable {
     protected double x, y;
-    protected Color color;
+    protected transient Color color;
+    protected double colorR, colorG, colorB, colorOpacity;
     protected boolean visible = true;
     protected boolean shadowEnabled = false;
     protected String text = "";
@@ -14,7 +16,7 @@ public abstract class Pixel implements Shape {
     public Pixel(double x, double y, Color color) {
         this.x = x;
         this.y = y;
-        this.color = color;
+        setColor(color);
     }
 
     public abstract void draw(GraphicsContext gc);
@@ -25,11 +27,7 @@ public abstract class Pixel implements Shape {
     public double getX() { return x; }
     public double getY() { return y; }
 
-    @Override
-    public void move(double dx, double dy) {
-        x += dx;
-        y += dy;
-    }
+    public void move(double dx, double dy) { x += dx; y += dy; }
 
     public void setShadow(boolean enabled) { this.shadowEnabled = enabled; }
     public boolean isShadowEnabled() { return shadowEnabled; }
@@ -39,6 +37,30 @@ public abstract class Pixel implements Shape {
     public String getFillPattern() { return fillPattern; }
     public void setVisible(boolean visible) { this.visible = visible; }
     public boolean isVisible() { return visible; }
+    
     public Color getColor() { return color; }
-    public void setColor(Color color) { this.color = color; }
+    public void setColor(Color color) { 
+        this.color = color; 
+        this.colorR = color.getRed();
+        this.colorG = color.getGreen();
+        this.colorB = color.getBlue();
+        this.colorOpacity = color.getOpacity();
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+        out.defaultWriteObject();
+        out.writeDouble(colorR);
+        out.writeDouble(colorG);
+        out.writeDouble(colorB);
+        out.writeDouble(colorOpacity);
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        this.colorR = in.readDouble();
+        this.colorG = in.readDouble();
+        this.colorB = in.readDouble();
+        this.colorOpacity = in.readDouble();
+        this.color = new Color(colorR, colorG, colorB, colorOpacity);
+    }
 }

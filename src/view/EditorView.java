@@ -12,6 +12,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.FileChooser;
+import javafx.scene.control.Alert;
 import java.util.List;
 
 public class EditorView {
@@ -20,8 +22,10 @@ public class EditorView {
     private ComboBox<String> toolSelector;
     private Button btnFinishPoly;
     private EditorController controller;
+    private Stage stage;
 
     public EditorView(Stage stage, EditorController controller) {
+        this.stage = stage;
         this.controller = controller;
 
         BorderPane root = new BorderPane();
@@ -30,7 +34,27 @@ public class EditorView {
         canvas.setOnMousePressed(controller::onMousePressed);
         canvas.setOnMouseDragged(controller::onMouseDragged);
         canvas.setOnMouseReleased(controller::onMouseReleased);
-        root.setCenter(canvas);
+
+        // Меню бар
+        MenuBar menuBar = new MenuBar();
+        
+        Menu fileMenu = new Menu("Файл");
+        MenuItem newFile = new MenuItem("Новый");
+        newFile.setOnAction(e -> controller.newDrawing());
+        MenuItem saveFile = new MenuItem("Сохранить");
+        saveFile.setOnAction(e -> saveFile());
+        MenuItem loadFile = new MenuItem("Открыть");
+        loadFile.setOnAction(e -> loadFile());
+        fileMenu.getItems().addAll(newFile, saveFile, loadFile);
+
+        Menu editMenu = new Menu("Правка");
+        MenuItem undo = new MenuItem("Отменить (Ctrl+Z)");
+        undo.setOnAction(e -> controller.undo());
+        MenuItem redo = new MenuItem("Повторить (Ctrl+Y)");
+        redo.setOnAction(e -> controller.redo());
+        editMenu.getItems().addAll(undo, redo);
+
+        menuBar.getMenus().addAll(fileMenu, editMenu);
 
         HBox topPanel = new HBox(10);
         topPanel.setPadding(new Insets(10));
@@ -44,7 +68,9 @@ public class EditorView {
         btnFinishPoly.setStyle("-fx-base: #ffcc00; -fx-font-weight: bold;");
 
         topPanel.getChildren().addAll(btnClear, btnFinishPoly);
-        root.setTop(topPanel);
+
+        VBox centerBox = new VBox(menuBar, topPanel, canvas);
+        root.setCenter(centerBox);
 
         VBox leftPanel = new VBox(10);
         leftPanel.setPadding(new Insets(10));
@@ -53,13 +79,13 @@ public class EditorView {
         Label lblTool = new Label("Инструмент:");
         toolSelector = new ComboBox<>();
         toolSelector.getItems().addAll(
-                "Точка (рисовать мышью)",
-                "Круг (клик для создания)",
-                "Круг (рисовать мышью)",
-                "Квадрат (клик для создания)",
-                "Квадрат (рисовать мышью)",
-                "Полигон (серия кликов)",
-                "Выделение / Перемещение"
+            "Точка (рисовать мышью)",
+            "Круг (клик для создания)",
+            "Круг (рисовать мышью)",
+            "Квадрат (клик для создания)",
+            "Квадрат (рисовать мышью)",
+            "Полигон (серия кликов)",
+            "Выделение / Перемещение"
         );
         toolSelector.setValue("Точка (рисовать мышью)");
 
@@ -87,16 +113,16 @@ public class EditorView {
         btnShadow.setOnAction(e -> controller.applyShadow());
 
         leftPanel.getChildren().addAll(
-                lblTool, toolSelector,
-                new Separator(),
-                new Label("Цвет фигуры / декора:"), colorPicker,
-                sep1,
-                lblDecorators, btnFill, btnBorder, btnShadow
+            lblTool, toolSelector,
+            new Separator(),
+            new Label("Цвет фигуры / декора:"), colorPicker,
+            sep1,
+            lblDecorators, btnFill, btnBorder, btnShadow
         );
         root.setLeft(leftPanel);
 
         Scene scene = new Scene(root, 1200, 650);
-        stage.setTitle("Графический редактор (Инкремент 1 + 2)");
+        stage.setTitle("Графический редактор (Инкремент 3)");
         stage.setScene(scene);
         stage.show();
     }
@@ -146,5 +172,41 @@ public class EditorView {
 
     public Color getSelectedColor() {
         return colorPicker.getValue();
+    }
+
+    private void saveFile() {
+        FileChooser fc = new FileChooser();
+        fc.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Graph Editor", "*.graph"),
+            new FileChooser.ExtensionFilter("Все файлы", "*.*")
+        );
+        java.io.File f = fc.showSaveDialog(stage);
+        if (f != null) {
+            String path = f.getAbsolutePath();
+            if (!path.endsWith(".graph")) {
+                path += ".graph";
+            }
+            controller.save(path);
+        }
+    }
+
+    private void loadFile() {
+        FileChooser fc = new FileChooser();
+        fc.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Graph Editor", "*.graph"),
+            new FileChooser.ExtensionFilter("Все файлы", "*.*")
+        );
+        java.io.File f = fc.showOpenDialog(stage);
+        if (f != null) {
+            controller.load(f.getAbsolutePath());
+        }
+    }
+
+    public void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Ошибка");
+        alert.setHeaderText("Не удалось выполнить операцию");
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
